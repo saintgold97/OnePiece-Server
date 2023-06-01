@@ -8,38 +8,43 @@ const router = express.Router();
 //add fruits
 router.post(
   "/",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   body("romaji_name").exists().isString(),
   body("type").exists().isString(),
   body("description").exists().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  isAuth,
+  //isAuth,
+
   async (req, res) => {
-    const { romaji_name, type, description, urlImg } = req.body;
-    const fruit = new Fruits({
-      romaji_name,
-      type,
-      description,
-      urlImg,
-    });
-    //Adds document to collection
-    const fruitsSaved = await fruit.save();
-    res.status(201).json(fruit);
+    try {
+      const { romaji_name, type, description, urlImg } = req.body;
+      const fruit = new Fruits({
+        romaji_name,
+        type,
+        description,
+        urlImg,
+      });
+      //Adds document to collection
+      const fruitsSaved = await fruit.save();
+      res.status(201).json(fruit);
+    } catch (err) {
+      res.status(400).json({ message: "Fields required"});
+    }
   }
 );
 
 //edit fruits
 router.patch(
   "/:id",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   param("id").isMongoId(),
   body("romaji_name").optional().isString(),
   body("type").optional().isString(),
   body("description").optional().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  isAuth,
+  // isAuth,
   async (req, res) => {
     const { id } = req.params;
     const { romaji_name, type, description, urlImg } = req.body;
@@ -67,10 +72,10 @@ router.patch(
 //delete fruits
 router.delete(
   "/:id",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   param("id").isMongoId(),
   checkErrors,
-  isAuth,
+  //isAuth,
   async (req, res) => {
     const { id } = req.params;
     const fruitDeleted = await Fruits.findByIdAndDelete(id);
@@ -84,10 +89,9 @@ router.delete(
 router.get(
   "/",
   query("type").optional().isString(),
-  query("description").optional().isString(),
   checkErrors,
   async (req, res) => {
-    const filters: any = {}
+    const filters: any = {};
     for (const queryKey in req.query) {
       if (req.query.hasOwnProperty(queryKey)) {
         const queryValue = req.query[queryKey];

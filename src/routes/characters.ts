@@ -8,7 +8,7 @@ const router = express.Router();
 //add characters
 router.post(
   "/",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   body("name").exists().isString(),
   body("role").exists().isString(),
   body("size").exists().isString(),
@@ -18,29 +18,33 @@ router.post(
   body("crew").exists().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  isAuth,
+  //isAuth,
   async (req, res) => {
-    const { name, role, size, age, bounty, fruit, crew, urlImg } = req.body;
-    const character = new Characters({
-      name,
-      role,
-      size,
-      age,
-      bounty,
-      fruit,
-      crew,
-      urlImg,
-    });
-    //Adds document to collection
-    const charactersSaved = await character.save();
-    res.status(201).json(character);
+    try {
+      const { name, role, size, age, bounty, fruit, crew, urlImg } = req.body;
+      const character = new Characters({
+        name,
+        role,
+        size,
+        age,
+        bounty,
+        fruit,
+        crew,
+        urlImg,
+      });
+      //Adds document to collection
+      const charactersSaved = await character.save();
+      res.status(201).json(character);
+    } catch (err) {
+      res.status(400).json({ message: "Fields required" });
+    }
   }
 );
 
 //edit characters
 router.patch(
   "/:id",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   param("id").isMongoId(),
   body("name").optional().isString(),
   body("role").optional().isString(),
@@ -51,7 +55,7 @@ router.patch(
   body("crew").optional().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  isAuth,
+  /*   isAuth, */
   async (req, res) => {
     const { id } = req.params;
     const { name, role, size, age, bounty, fruit, crew, urlImg } = req.body;
@@ -83,10 +87,10 @@ router.patch(
 //delete characters
 router.delete(
   "/:id",
-  header("authorization").isJWT(),
+  //header("authorization").isJWT(),
   param("id").isMongoId(),
   checkErrors,
-  isAuth,
+  //isAuth,
   async (req, res) => {
     const { id } = req.params;
     const characterDelete = await Characters.findByIdAndDelete(id);
