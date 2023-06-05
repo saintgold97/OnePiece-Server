@@ -13,8 +13,6 @@ export const checkErrors = (
   // Finds the validation errors in this request and wraps them in an object with handy functions
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-   
-
 
  //ho modificato param con msg da ricontrollare
     if (errors.array()[0].msg === "authorization") {

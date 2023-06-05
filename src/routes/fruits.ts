@@ -8,13 +8,13 @@ const router = express.Router();
 //add fruits
 router.post(
   "/",
-  //header("authorization").isJWT(),
+  header("authorization").isJWT(),
   body("romaji_name").exists().isString(),
   body("type").exists().isString(),
   body("description").exists().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  //isAuth,
+  isAuth,
 
   async (req, res) => {
     try {
@@ -37,14 +37,14 @@ router.post(
 //edit fruits
 router.patch(
   "/:id",
-  //header("authorization").isJWT(),
+  header("authorization").isJWT(),
   param("id").isMongoId(),
   body("romaji_name").optional().isString(),
   body("type").optional().isString(),
   body("description").optional().isString(),
   body("urlImg").optional().isString(),
   checkErrors,
-  // isAuth,
+  isAuth,
   async (req, res) => {
     const { id } = req.params;
     const { romaji_name, type, description, urlImg } = req.body;
@@ -72,10 +72,10 @@ router.patch(
 //delete fruits
 router.delete(
   "/:id",
-  //header("authorization").isJWT(),
+  header("authorization").isJWT(),
   param("id").isMongoId(),
   checkErrors,
-  //isAuth,
+  isAuth,
   async (req, res) => {
     const { id } = req.params;
     const fruitDeleted = await Fruits.findByIdAndDelete(id);

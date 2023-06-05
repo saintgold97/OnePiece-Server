@@ -5,6 +5,10 @@ import crews from "./routes/crews";
 import fruits from "./routes/fruits";
 import users from "./routes/users";
 import cors from "cors";
+import dotenv from "dotenv"
+
+dotenv.config();
+
 export const app = express();
 
 const apiVersion = "v1"
@@ -17,10 +21,10 @@ app.use(`/${apiVersion}/fruits`, fruits);
 app.use(`/${apiVersion}/users`, users);
 
 //SERVER
-app.listen(process.env.PORT || 3001, async () => {
+app.listen(process.env.PORT, async () => {
   console.log("Server is running");
   await mongoose
-    .connect(`mongodb://127.0.0.1:27017/${process.env.DB}`)
+    .connect(`${String(process.env.MONGO_URL)}/${process.env.DB}`)
     .then(() => {
       console.log("| Connection to MongoDB | HOST: localhost:27017");
     })

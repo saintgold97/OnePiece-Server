@@ -5,6 +5,8 @@ import { checkErrors, isAuth } from "../utils/utils";
 import bcrypt from "bcrypt";
 import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
+import EmailConnection from "../utils/emailUtils/config/NodeMailer";
+import { VerifyAccount } from "../utils/emailUtils/template/template";
 export const saltRounds = 10;
 const jwtToken = "default";
 
@@ -19,28 +21,44 @@ router.post(
   body("surname").notEmpty(),
   checkErrors,
   async (req, res) => {
-    try {
-      const verify = v4();
-      const { name, surname, email, password } = req.body;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const verify = v4();
+    const { name, surname, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      const user = new User({
-        name,
-        surname,
-        email,
-        password: hashedPassword,
-        verify,
-      });
+    const user = new User({
+      name,
+      surname,
+      email,
+      password: hashedPassword,
+      verify,
+    });
+
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(409).json({ message: "Email is just present" });
+      }
+
       //Adds document to collection
       const response = await user.save();
-      res.status(201).json({
+      if (response) {
+        await EmailConnection(
+          user.email,
+          "Validate Email",
+          VerifyAccount(user.verify!)
+        );
+        console.log(user.email);
+        console.log("Response", response);
+      }
+      return res.status(201).json({
         name: user.name,
         id: response._id,
         surname: user.surname,
         email: user.email,
       });
     } catch (e) {
-      return res.status(409).json({ message: "Email is just present" });
+      console.log("Errore", e);
+      return res.status(500).json({ message: "Internal server error" });
     }
   }
 );
@@ -84,7 +102,7 @@ router.post(
         );
         return res.status(200).json({ token });
       } else {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(400).json({ message: "Invalid credentials" });
       }
     } catch (e) {
       console.log(e);

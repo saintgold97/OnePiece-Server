@@ -8,14 +8,14 @@ const router = express.Router();
 //add crews
 router.post(
   "/",
-  //header("authorization").isJWT(),
+  header("authorization").isJWT(),
   body("english_name").exists().isString(),
   body("romaji_name").exists().isString(),
   body("total_bounty").exists().isString(),
   body("number_members").exists().isNumeric(),
   body("urlImg").optional().isString(),
   checkErrors,
-  //isAuth,
+  isAuth,
   async (req, res) => {
     try {
       const {
@@ -44,7 +44,7 @@ router.post(
 //edit crews
 router.patch(
   "/:id",
-  // header("authorization").isJWT(),
+  header("authorization").isJWT(),
   param("id").isMongoId(),
   body("english_name").optional().isString(),
   body("romaji_name").optional().isString(),
@@ -52,7 +52,7 @@ router.patch(
   body("number_members").optional().isNumeric(),
   body("urlImg").optional().isString(),
   checkErrors,
-  //isAuth,
+  isAuth,
   async (req, res) => {
     const { id } = req.params;
     const { english_name, romaji_name, total_bounty, number_members, urlImg } =
@@ -82,10 +82,10 @@ router.patch(
 //delete crews
 router.delete(
   "/:id",
-  //header("authorization").isJWT(),
+  header("authorization").isJWT(),
   param("id").isMongoId(),
   checkErrors,
-  // isAuth,
+  isAuth,
   async (req, res) => {
     const { id } = req.params;
     const crewDeleted = await Crews.findByIdAndDelete(id);
